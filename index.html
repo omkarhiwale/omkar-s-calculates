@@ -66,6 +66,8 @@
             text-align: right;
             border: 1px solid #333;
             box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.5);
+            display: flex; /* Added for alignment */
+            align-items: center; /* Vertically center content */
         }
 
         #display-input {
@@ -76,6 +78,16 @@
             word-wrap: break-word;
             word-break: break-all;
             min-height: 50px; /* Ensure it doesn't collapse */
+            white-space: pre-wrap; /* Respect newline characters */
+        }
+        
+        /* --- Style for the special message --- */
+        #display-input.special-message {
+            font-size: 1.7rem; /* Smaller font for the message */
+            color: var(--red-accent); /* Make it red */
+            font-weight: 700;
+            text-align: center;
+            line-height: 1.2; /* Adjust line height for two lines */
         }
 
         /* --- Button Grid --- */
@@ -170,6 +182,8 @@
         // Get the display element from the DOM
         const display = document.getElementById('display-input');
         let currentInput = '0';
+        // Added a newline character (\n) to break the message into two lines
+        const specialMessage = ' I Love you dikshuuu\nbaby ❤😘'; 
 
         // Function to update the display
         function updateDisplay() {
@@ -178,8 +192,11 @@
 
         // Function to append characters (numbers or operators) to the display
         function appendCharacter(char) {
-            // If current input is '0' or an error, replace it with the new character
-            if (currentInput === '0' || currentInput === 'Error') {
+            // Remove special styling when starting a new calculation
+            display.classList.remove('special-message');
+
+            // If current input is '0', an error, or the special message, replace it
+            if (currentInput === '0' || currentInput === 'Error' || currentInput === specialMessage) {
                 // Prevent starting with an operator (except for a negative sign)
                 if ('*/+'.includes(char)) {
                     currentInput = '0' + char;
@@ -195,21 +212,40 @@
         // Function to clear the entire display and reset the input
         function clearDisplay() {
             currentInput = '0';
+            display.classList.remove('special-message');
             updateDisplay();
         }
 
         // Function to delete the last character from the input
         function deleteLast() {
+            // If the special message is showing, clear it completely
+            if (currentInput === specialMessage) {
+                clearDisplay();
+                return;
+            }
+            // Otherwise, delete the last character
             if (currentInput.length > 1 && currentInput !== 'Error') {
                 currentInput = currentInput.slice(0, -1);
             } else {
                 currentInput = '0';
             }
+            display.classList.remove('special-message');
             updateDisplay();
         }
 
         // Function to perform the calculation
         function calculateResult() {
+            // Easter Egg for a special message
+            if (currentInput === '80+31') {
+                currentInput = specialMessage;
+                display.classList.add('special-message');
+                updateDisplay();
+                return; // Stop further execution
+            }
+
+            // Remove special styling for regular calculations
+            display.classList.remove('special-message');
+
             try {
                 // Replace visual operators with evaluatable ones
                 let expression = currentInput.replace(/×/g, '*').replace(/÷/g, '/');
